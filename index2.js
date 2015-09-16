@@ -1,6 +1,6 @@
 var Crawler = require("crawler");
 var url = require('url');
-
+var domain = 'http://www.zhihu.com/';
 var c = new Crawler({
     maxConnections: 10,
     // This will be called for each crawled page
