@@ -22,7 +22,7 @@ exports.question = async.queue(function crawl(url, next) {
 
         next()
     });
-}, 10);
+}, 5);
 
 exports.user = async.queue(function crawl(url, next) {
     if (!url || seen[url]) return next(null);
@@ -42,7 +42,7 @@ exports.user = async.queue(function crawl(url, next) {
 
         next()
     });
-}, 10);
+}, 5);
 
 
 exports.topic = async.queue(function crawl(url, next) {
@@ -63,4 +63,4 @@ exports.topic = async.queue(function crawl(url, next) {
 
         next()
     });
-}, 10);
+}, 5);

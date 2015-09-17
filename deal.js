@@ -2,43 +2,48 @@ var domain = 'http://www.zhihu.com';
 var cheerio = require('cheerio');
 var queue = require('./queue.js');
 var db = require('./db.js');
+var isDb = process.argv.indexOf('db') > -1 ? true : false
+
 exports.question = function($) {
     if (!$) return
     var obj = {}
-    var objT = {}
-    obj.question = '';
-    obj.topic = '';
+    obj.question = {
+        name: $('#zh-question-title .zm-item-title').text(),
+        detail: $('#zh-question-detail .zm-editable-content').html(),
+        id: $('.question-page').attr('data-urltoken'),
+        url: domain + '/question/' + $('.question-page').attr('data-urltoken'),
+        aNum: $('.zh-answers-title h3').attr('data-num')
+    };
+    obj.topic = [];
     $('.question_link').map(function(i, e) {
         url = domain + $(e).attr('href')
-        obj.question = $(e).text();
         queue.question.push(url); //push question link
     })
     $('.zm-item-tag').map(function(j, k) {
-        topId = $(k).attr('data-topicid')
-        url = domain + "/topic/" + topId
-        obj.topic = obj.topic.concat(topId, "/")
+        objT = {}
+        objT.id = $(k).attr('data-token')
+        objT.url = domain + '/topic/' + objT.id
+        objT.name = $(k).text()
+        obj.topic = obj.topic.concat(objT)
+        url = domain + "/topic/" + objT.id
         queue.topic.push(url); //push topic link
     })
     $('.zm-item-answer').map(function(j, k) {
-        obj.count = $(k).find('.up .count').text()
-        if (obj.count.indexOf('K') > -1) {
-            obj.count = parseInt(obj.count.split('K')[0]) * 1000
-        } else if (obj.count.indexOf('M') > -1) {
-            obj.count = parseInt(obj.count.split('M')[0]) * 1000000
-        } else {
-            obj.count = parseInt(obj.count)
-        }
+        url = domain + $(k).find('.zm-item-answer-author-wrap a').eq(0).attr('href');
+        queue.user.push(url) //push user link
+        obj.count = parseInt($(k).find('.zm-item-vote-info').attr('data-votecount'))
         if (obj.count > 1000) {
             obj.answer = $(k).find('.zm-editable-content').html()
-            obj.userName = $(k).find('.zm-item-answer-author-wrap a').eq(1).text();
-            obj.userDescribe = $(k).find('.zm-item-answer-author-wrap strong').eq(0).text();
-            obj.userAvatar = $(k).find('.zm-item-answer-author-wrap a img').attr('src');
-            obj.userHome = domain + $(k).find('.zm-item-answer-author-wrap a').eq(0).attr('href');
+            obj.user = {
+                name: $(k).find('.zm-item-answer-author-wrap a').eq(1).text(),
+                bio: $(k).find('.zm-item-answer-author-wrap strong').eq(0).text(),
+                sAvatar: $(k).find('.zm-item-answer-author-wrap a img').attr('src'),
+                home: url
+            }
             obj.answerTime = $(k).find('.answer-date-link').text().split(' ')[1];
             obj.answerUrl = domain + $(k).find('.answer-date-link').attr('href');
             console.log(obj);
-            db.writeQuestion(obj)
-            queue.user.push(obj.userHome) //push user link
+            if (isDb) db.writeQuestion(obj)
         }
     })
 }
@@ -46,7 +51,8 @@ exports.question = function($) {
 exports.user = function($) {
     var obj = {}
     obj.name = $('.title-section .name').text();
-    obj.describe = $('.title-section .bio').text();
+    obj.bio = $('.title-section .bio').text();
+    var weibo = $('.zm-profile-header-user-weibo').attr('href')
     obj.avatar = $('.zm-profile-header-avatar-container img').attr('src')
     obj.location = $('.info-wrap .location').text();
     obj.bussiness = $('.info-wrap .business').text();
@@ -66,17 +72,19 @@ exports.user = function($) {
     obj.focusTopics = $('.zm-profile-side-section-title strong').text().toString().split(' ')[0]
     obj.see = $('.zm-profile-side-section .zg-gray-normal strong').text()
     console.log(obj)
-    db.writeUser(obj)
+    if (isDb) db.writeUser(obj)
 }
 
 exports.topic = function($) {
     var obj = {}
-    obj.thumb = $('.topic-avatar .zm-entry-head-avatar-link img').attr('src')
-    obj.name = $('.topic-avatar .zm-entry-head-avatar-link img').attr('alt')
-    obj.home = domain + $('.topic-avatar .zm-entry-head-avatar-link').attr('href')
-    obj.topId = String($('.topic-avatar .zm-entry-head-avatar-link').attr('href')).split('/')[2]
-    obj.describe = $('#zh-topic-desc .zm-editable-content').text()
     obj.follow = $('.zm-topic-side-followers-info strong').eq(0).text()
-    console.info(obj)
-    db.writeTopic(obj)
+    if (obj.follow > 10000) {
+        obj.thumb = $('.topic-avatar .zm-entry-head-avatar-link img').attr('src')
+        obj.name = $('.topic-avatar .zm-entry-head-avatar-link img').attr('alt')
+        obj.home = domain + $('.topic-avatar .zm-entry-head-avatar-link').attr('href')
+        obj.id = String($('.topic-avatar .zm-entry-head-avatar-link').attr('href')).split('/')[2]
+        obj.describe = $('#zh-topic-desc .zm-editable-content').text()
+        console.info(obj)
+        if (isDb) db.writeTopic(obj)
+    }
 }
