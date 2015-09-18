@@ -4,9 +4,11 @@ this project is created by [youths](http://youths.cc).
 ##Installation
 You need nodejs,mongodb installed.
 
-- git clone https://github.com/TNT-Likely/crawler.git
-- cd crawler
-- npm install
+```sh
+$ git clone https://github.com/TNT-Likely/crawler.git
+$ cd crawler
+$ npm install
+```
 
 ##Structure
 - index.js      get zhihu question user topic
