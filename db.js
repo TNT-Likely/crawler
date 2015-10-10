@@ -63,3 +63,10 @@ exports.getUser = function() {
         }
     })
 }
+
+exports.getAvatar = function(callback) {
+    var postUrl = apiServer + '/api/zhihuusers?filter[fields][avatar]=true&filter[order]=agree%20DESC';
+    request.get({
+        url: postUrl
+    }, callback)
+}

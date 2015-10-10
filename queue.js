@@ -64,3 +64,16 @@ exports.topic = async.queue(function crawl(url, next) {
         next()
     });
 }, 5);
+
+exports.avatar = async.queue(function crawl(url, next) {
+    var newName = url.split('/')[2] + "-" + url.split('/')[3]
+    request.get('http://api.youths.cc/api/containers/zhihuuser/files/' + newName, function(err, response, body) {
+        if (JSON.parse(body).error || JSON.parse(body).size == 0) {
+            console.log('yes');
+            request.get('http://api.youths.cc/update?url=' + url, function(err, data) {
+
+            })
+        }
+        next()
+    })
+}, 5);
