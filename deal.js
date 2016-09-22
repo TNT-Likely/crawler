@@ -35,11 +35,12 @@ exports.question = function($) {
         if (obj.count > 1000) {
             obj.answer = $(k).find('.zm-editable-content').html()
             obj.user = {
-                name: $(k).find('.zm-item-answer-author-wrap a').eq(1).text(),
-                bio: $(k).find('.zm-item-answer-author-wrap strong').eq(0).text(),
-                sAvatar: $(k).find('.zm-item-answer-author-wrap a img').attr('src'),
+                name: $(k).find('.zm-item-answer-author-info .author-link-line .author-link').text(),
+                bio: $(k).find('.zm-item-answer-author-info .bio').text(),
+                sAvatar: $(k).find('.zm-item-answer-author-info .zm-list-avatar.avatar').attr('src'),
                 home: url
             }
+            console.log("userinfo",obj.user)
             obj.answerTime = $(k).find('.answer-date-link').text().split(' ')[1];
             obj.answerUrl = domain + $(k).find('.answer-date-link').attr('href');
             console.log(obj);
