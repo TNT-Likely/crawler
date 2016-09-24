@@ -1,5 +1,8 @@
 export default {
-	storage:{
-		path:'/data/static/'
-	}
+  storage: {
+    path: '/data/static/'
+  },
+  queue: {
+    size: 10
+  }
 }
