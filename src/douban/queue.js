@@ -10,6 +10,6 @@ export let douban = queue((url, callback) => {
         console.log(`download success >>> ${item.src}`)
       })
     })
-    callback()
+    callback(url)
   })
 }, config.queue.size)
