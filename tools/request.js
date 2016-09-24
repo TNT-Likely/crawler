@@ -27,6 +27,7 @@ export default {
       filename = filename.split('/').pop()
     }
     if (!filename) filename = url.split('/').pop()
+    filename = filename.split('?')[0]
     if (!fs.existsSync(path)) fs.mkdirSync(path)
     if (!fs.existsSync(`${path+filename}`)) {
       request(url).pipe(fs.createWriteStream(`${path+filename}`)).on('close', callback)
