@@ -1,4 +1,4 @@
-import * as _queue from './queue'
+import * as _queue from '../components/queue'
 
 for (var i = 162; i < 822; i++) {
   _queue.douban.push(`http://www.dbmeinv.com/dbgroup/rank.htm?pager_offset=${i}`, () => {
